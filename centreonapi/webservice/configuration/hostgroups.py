@@ -16,3 +16,7 @@ class Hostgroups(object):
         """
         return self.webservice.call_clapi('show', 'HG')
 
+    def add(self, name, alias):
+        values = [ name , alias ]
+        return self.webservice.call_clapi('add', 'HG', values)
+

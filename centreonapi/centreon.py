@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from centreonapi.webservice import Webservice
-from centreonapi.webservice.configuration.host import Host
+from centreonapi.webservice.configuration.host import *
 from centreonapi.webservice.configuration.poller import Poller
 from centreonapi.webservice.configuration.hostgroups import Hostgroups
 from centreonapi.webservice.configuration.templates import Templates
@@ -43,7 +42,7 @@ class Centreon(object):
 
     def exists_host(self, name):
         if self.availableHost is None:
-            self.get_available_object()
+            self.availableHost = self.host.list()
         return self._exists(name, self.availableHost)
 
     def exists_hostgroups(self, name):
@@ -53,7 +52,8 @@ class Centreon(object):
 
     def exists_poller(self, name):
         if self.availablePoller is None:
-            self.get_available_object()
+            # Only refresh poller list.
+            self.availablePoller = self.poller.list()
         return self._exists(name, self.availablePoller)
 
     def exists_hosttemplates(self, name):
@@ -61,3 +61,8 @@ class Centreon(object):
             self.get_available_object()
         return self._exists(name, self.availableHostTemplates)
 
+    def host_list(self):
+        list_host = list()
+        for host in self.availableHost['result']:
+            list_host.append(HostObj(host))
+        return list_host

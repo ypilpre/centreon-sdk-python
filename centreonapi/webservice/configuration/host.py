@@ -2,6 +2,26 @@
 
 from centreonapi.webservice import Webservice
 
+class HostObj(object):
+
+    def __init__(self, properties):
+        self.name = properties['name']
+        self.state = properties['activate']
+        self.address = properties['address']
+        self.alias = properties['alias']
+
+    def name(self):
+        return self.name
+
+    def address(self):
+        return self.address()
+
+    def alias(self):
+        return self.alias()
+
+    def state(self):
+        return self.state()
+
 
 class Host(object):
     """
@@ -28,9 +48,9 @@ class Host(object):
             hostname,
             hostalias,
             hostip,
-            hosttemplate,
+            '|'.join(hosttemplate),
             pollername,
-            hgname
+            '|'.join(hgname)
         ]
         return self.webservice.call_clapi('add', 'HOST', values)
 
@@ -60,15 +80,15 @@ class Host(object):
         return self.webservice.call_clapi('gettemplate', 'HOST', hostname)
 
     def settemplate(self, hostname, template):
-        values = [hostname, template]
+        values = [hostname, "|".join(template)]
         return self.webservice.call_clapi('settemplate', 'HOST', values)
 
     def addtemplate(self, hostname, template):
-        values = [hostname, template]
+        values = [hostname, "|".join(template)]
         return self.webservice.call_clapi('addtemplate', 'HOST', values)
 
     def deletetemplate(self, hostname, template):
-        values = [hostname, template]
+        values = [hostname, "|".join(template)]
         return self.webservice.call_clapi('delemplate', 'HOST', values)
 
     def applytemplate(self, hostname):
