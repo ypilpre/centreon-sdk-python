@@ -35,5 +35,4 @@ class Poller(object):
         pass
 
     def gethosts(self, pollername):
-        #return self.webservice.call_clapi('gethosts', 'INSTANCE', pollername)
-        pass
+        return self.webservice.call_clapi('gethosts', 'INSTANCE', pollername)

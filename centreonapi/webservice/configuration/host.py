@@ -58,6 +58,12 @@ class Host(object):
         return self.webservice.call_clapi('del', 'HOST', hostname)
 
     def setparameters(self, hostname, name, value):
+        """
+        DEPRECATED 
+        """
+        return self.setparam(hostname, name, value)
+
+    def setparam(self, hostname, name, value):
         values = [hostname, name, value]
         return self.webservice.call_clapi('setparam', 'HOST', values)
 
@@ -145,11 +151,11 @@ class Host(object):
     def deletehostgroup(self, hostname, hostgroups):
         return self.webservice.call_clapi('delhostgroup', 'HOST', [hostname, "|".join(hostgroups)])
 
-    def setseverity(self, *args, **kwargs):
-        raise NotImplementedError
+    def setseverity(self, hostname, name):
+        return self.webservice.call_clapi('setseverity', 'HOST', [hostname, name    ])
 
-    def unsetseverity(self, *args, **kwargs):
-        raise NotImplementedError
+    def unsetseverity(self, hostname):
+        return self.webservice.call_clapi('unsetseverity', 'HOST', hostname)
 
     def enable(self, hostname):
         return self.webservice.call_clapi('enable', 'HOST', hostname)
