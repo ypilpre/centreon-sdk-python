@@ -20,9 +20,10 @@ class Webservice(object):
             Webservice.__instance.authuser = None
             Webservice.__instance.authpass = None
             Webservice.__instance.auth_token = None
+            Webservice.__instance.check_ssl = True
         return Webservice.__instance
 
-    def load(self, url, username, password):
+    def load(self, url, username, password, check_ssl=True):
         """
         Load configuration for webservices
 
@@ -36,6 +37,7 @@ class Webservice(object):
         self.url = url
         self.authuser = username
         self.authpass = password
+        self.check_ssl = check_ssl
 
     def isLoaded(self):
         """
@@ -57,7 +59,8 @@ class Webservice(object):
             data={
                 'username': self.authuser,
                 'password': self.authpass
-            }
+            },
+            verify=self.check_ssl
         )
         request.raise_for_status()
         data = request.json()
@@ -94,13 +97,36 @@ class Webservice(object):
                 'Content-Type': 'application/json',
                 'centreon-auth-token': self.auth_token
             },
-            data=json.dumps(data)
+            data=json.dumps(data),
+            verify=self.check_ssl
         )
         request.raise_for_status()
         return request.json()
 
+    def centreon_realtime(self, action=None, obj=None, values=None):
+        if self.auth_token is None:
+            self.auth()
+
+        data = {}
+
+        if values is not None:
+            data['values'] = values
+
+        request = requests.post(
+            self.url + '/api/index.php?object=centreon_realtime_' + obj + '&?action=' + action,
+            headers={
+                'Content-Type': 'application/json',
+                'centreon-auth-token': self.auth_token
+            },
+            data=json.dumps(data),
+            verify=self.check_ssl
+        )
+        request.raise_for_status()
+        return request.json()
+
+
     @staticmethod
-    def getInstance(url=None, username=None, password=None):
+    def getInstance(url=None, username=None, password=None, check_ssl=True):
         """
         Get an unique instance of the webservices
 
@@ -116,5 +142,5 @@ class Webservice(object):
             return instance
         if url is None or username is None or password is None:
             raise KeyError('Missing parameters to load the Webservice')
-        instance.load(url, username, password)
+        instance.load(url, username, password, check_ssl)
         return instance
