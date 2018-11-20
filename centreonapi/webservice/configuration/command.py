@@ -1,23 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from centreonapi.webservice import Webservice
+from centreonapi.webservice.configuration.common import *
 from bs4 import BeautifulSoup
+from overrides import overrides
 
 
-class CommandObj(object):
+class CommandObj(CentreonObject):
 
     def __init__(self, properties):
         self.id = properties['id']
         self.name = properties['name']
         self.line = self._build_command_line(properties['line'])
         self.type = properties['type']
-
-    def __repr__(self):
-        return self.name
-
-    def __str__(self):
-        return self.__repr__()
-
 
     @staticmethod
     def _build_command_line(line):
@@ -34,44 +28,38 @@ class CommandObj(object):
             return ""
 
 
-class Command(object):
+class Command(CentreonDecorator, CentreonClass):
     """
     Centreon Web Command object
     """
-
     def __init__(self):
-        """
-        Constructor
-        """
-        self.webservice = Webservice.getInstance()
+        super(Command, self).__init__()
         self.commands = dict()
 
-    def get(self, name):
-        if not self.commands:
-            self.list()
-        return self.commands[name]
+    def __contains__(self, name):
+        return name in self.commands.keys()
 
-    def exist(self, name):
+    def __getitem__(self, name):
         if not self.commands:
             self.list()
-        if name in self.commands:
-            return True
+        if name in self.commands.keys():
+            return self.commands[name]
         else:
-            return False
+            raise ValueError("Command %s not found" % name)
 
-    def list(self):
-        """
-        List resource
-        """
+    @overrides
+    def _refresh_list(self):
+        self.commands.clear()
         for command in self.webservice.call_clapi('show', 'CMD')['result']:
             command_obj = CommandObj(command)
             self.commands[command_obj.name] = command_obj
+
+    @CentreonDecorator.pre_refresh
+    def list(self):
         return self.commands
 
-    def add(self, cmdname, cmdtype, cmdline):
-        """
-        add new command
-        """
+    @CentreonDecorator.post_refresh
+    def add(self, cmdname, cmdtype, cmdline, post_refresh=True):
         values = [
             cmdname,
             cmdtype,
@@ -79,18 +67,14 @@ class Command(object):
         ]
         return self.webservice.call_clapi('add', 'CMD', values)
 
-    def delete(self, cmdname):
-        """
-        Delete a command
-        """
-        return self.webservice.call_clapi('del', 'CMD', cmdname)
+    @CentreonDecorator.post_refresh
+    def delete(self, command, post_refresh=True):
+        return self.webservice.call_clapi('del', 'CMD', command.name)
 
-    def setparam(self, cmdname, name, value):
-        """
-        SetParam on command
-        """
+    @CentreonDecorator.post_refresh
+    def setparam(self, command, name, value, post_refresh=True):
         values = [
-            cmdname,
+            command.name,
             name,
             value
         ]
