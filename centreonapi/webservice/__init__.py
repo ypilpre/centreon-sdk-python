@@ -2,6 +2,8 @@
 
 import requests
 import json
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
 
 class Webservice(object):
     """
@@ -108,17 +110,27 @@ class Webservice(object):
             self.auth()
 
         data = {}
+        obj_supported = ('hosts', 'services')
 
-        if values is not None:
-            data['values'] = values
+        if action is not None:
+            data['action'] = action
+        if obj is not None:
+            if obj in obj_supported:
+                data['object'] = obj
+            else:
+                raise ValueError("Only support <hosts> or <services>")
 
-        request = requests.post(
-            self.url + '/api/index.php?object=centreon_realtime_' + obj + '&?action=' + action,
+        if not self.check_ssl:
+        #    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+        request = requests.get(
+            self.url + '/api/index.php?object=centreon_realtime_' + obj + '&action=' + action,
             headers={
                 'Content-Type': 'application/json',
                 'centreon-auth-token': self.auth_token
             },
-            data=json.dumps(data),
+            params=values,
             verify=self.check_ssl
         )
         request.raise_for_status()

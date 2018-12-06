@@ -4,7 +4,7 @@ from centreonapi.webservice.configuration.common import *
 from overrides import overrides
 
 
-class PollerObj(CentreonObject):
+class Poller(CentreonObject):
 
     def __init__(self, properties):
         self.id = properties['id']
@@ -19,7 +19,7 @@ class PollerObj(CentreonObject):
         self.status = properties['status']
 
 
-class PollerHostObj(CentreonObject):
+class PollerHost(CentreonObject):
 
     def __init__(self, properties):
         self.id = properties['id']
@@ -28,13 +28,13 @@ class PollerHostObj(CentreonObject):
         self.poller = properties['poller']
 
 
-class Poller(CentreonDecorator, CentreonClass):
+class Pollers(CentreonDecorator, CentreonClass):
     """
     Centreon Web poller
     """
 
     def __init__(self):
-        super(Poller, self).__init__()
+        super(Pollers, self).__init__()
         self.pollers = dict()
         self.pollerHost = dict()
 
@@ -53,7 +53,7 @@ class Poller(CentreonDecorator, CentreonClass):
     def _refresh_list(self):
         self.pollers.clear()
         for poller in self.webservice.call_clapi('show', 'INSTANCE')['result']:
-            poller_obj = PollerObj(poller)
+            poller_obj = Poller(poller)
             self.pollers[poller_obj.name] = poller_obj
 
     def applycfg(self, pollername):
@@ -75,9 +75,9 @@ class Poller(CentreonDecorator, CentreonClass):
     def setparam(self, *args, **kwargs):
         pass
 
-    def gethosts(self, poller=PollerObj):
+    def gethosts(self, poller):
         for poller in self.webservice.call_clapi('gethosts', 'INSTANCE', poller.name)['result']:
             poller['poller'] = poller.name
-            pollerhost_obj = PollerHostObj(poller)
+            pollerhost_obj = PollerHost(poller)
             self.pollerHost[pollerhost_obj.name] = pollerhost_obj
         return self.pollerHost
