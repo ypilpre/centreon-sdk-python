@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from centreonapi.webservice.configuration.common import *
-from overrides import overrides
+from centreonapi.webservice.configuration.poller import Poller
 
 
-class ResourceCFGObj(CentreonObject):
+class ResourceCFG(CentreonObject):
 
     def __init__(self, properties):
         self.id = properties['id']
@@ -13,13 +13,21 @@ class ResourceCFGObj(CentreonObject):
         self.activate = properties['activate']
         self.value = properties['value']
 
+    def setparam(self, name, value):
+        values = [
+            self.id,
+            name,
+            value
+        ]
+        return self.webservice.call_clapi('setparam', 'RESOURCECFG', values)
 
-class ResourceCFG(CentreonDecorator, CentreonClass):
+
+class ResourceCFGs(CentreonDecorator, CentreonClass):
     """
     Centreon Web Resource object
     """
     def __init__(self):
-        super(ResourceCFG, self).__init__()
+        super(ResourceCFGs, self).__init__()
         self.resources = dict()
 
     @staticmethod
@@ -47,11 +55,10 @@ class ResourceCFG(CentreonDecorator, CentreonClass):
         else:
             raise ValueError("Resource %s not found" % rsc)
 
-    @overrides
     def _refresh_list(self):
         self.resources.clear()
         for resource in self.webservice.call_clapi('show', 'RESOURCECFG')['result']:
-            resource_obj = ResourceCFGObj(resource)
+            resource_obj = ResourceCFG(resource)
             self.resources[resource_obj.name] = resource_obj
 
     @CentreonDecorator.pre_refresh
@@ -63,22 +70,21 @@ class ResourceCFG(CentreonDecorator, CentreonClass):
         values = [
             rscname,
             rscvalue,
-            rscinstance,
+            str(self._build_param(rscinstance, Poller())),
             rsccomment
         ]
         return self.webservice.call_clapi('add', 'RESOURCECFG', values)
 
     @CentreonDecorator.post_refresh
     def delete(self, resource, post_refresh=True):
-        if not resource:
-            raise ValueError("Resource is empty")
-        return self.webservice.call_clapi('del', 'RESOURCECFG', resource.id)
+        value = int(self._build_resource_line(resource, ResourceCFG()))[0]
+        return self.webservice.call_clapi('del', 'RESOURCECFG', value)
 
-    @CentreonDecorator.post_refresh
-    def setparam(self, resource, name, value, post_refresh=True):
-        values = [
-            resource.id,
-            name,
-            value
-        ]
-        return self.webservice.call_clapi('setparam', 'RESOURCECFG', values)
+    #@CentreonDecorator.post_refresh
+    #def setparam(self, resource, name, value, post_refresh=True):
+    #    values = [
+    #        resource.id,
+    #        name,
+    #        value
+    #    ]
+    #    return self.webservice.call_clapi('setparam', 'RESOURCECFG', values)

@@ -1,0 +1,28 @@
+{
+  "result": [
+    {
+      "activate": "1",
+      "comment": "Nagios Plugins Path",
+      "id": "1",
+      "instance": ["Central", "poller1", "poller2"],
+      "name": "$USER1$",
+      "value": "/usr/lib64/nagios/plgins"
+    },
+    {
+      "activate": "1",
+      "comment": "Centreon Plgins Path",
+      "id": "2",
+      "instance": ["Central", "poller1", "poller2"],
+      "name": "$CENTREONPLUGINS$",
+      "value": "/usr/lib/centreon/plgins"
+    },
+    {
+      "activate": "1",
+      "comment": "Default snmp version",
+      "id": "3",
+      "instance": ["Central", "poller1", "poller2"],
+      "name": "$_HOSTSNMPVERSION$",
+      "value": "2c"
+    }
+  ]
+}

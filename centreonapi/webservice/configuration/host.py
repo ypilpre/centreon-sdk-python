@@ -30,39 +30,9 @@ class Host(CentreonObject):
         values = [self.name, name, value]
         return self.webservice.call_clapi('setmacro', 'HOST', values)
 
-    def deletemacro(self, name):
-        values = [self.name, name]
+    def deletemacro(self, macro):
+        values = [self.name, "|".join(self._build_param(macro, HostMacro()))]
         return self.webservice.call_clapi('delmacro', 'HOST', values)
-
-    @staticmethod
-    def __build_template(template=None):
-        if template and isinstance(template, HostTemplate):
-            _template = "|".join(template.name)
-        elif template and isinstance(template, list):
-            tmp_hosttmpl = list()
-            for htmpl in template:
-                tmp_hosttmpl.append(htmpl.name)
-            _template = "|".join(tmp_hosttmpl)
-        elif template and isinstance(template, str):
-            _template = template
-        else:
-            raise ValueError("HostTemplate must be defined")
-        return _template
-
-    @staticmethod
-    def __build_hostgroup(hg=None):
-        if hg and isinstance(hg, HostGroup):
-            _hg = "|".join(hg.name)
-        elif hg and isinstance(hg, list):
-            tmp_hg = list()
-            for hgobj in hg:
-                tmp_hg.append(hgobj.name)
-            _hg = "|".join(tmp_hg)
-        elif hg and isinstance(hg, str):
-            _hg = hg
-        else:
-            raise ValueError("HostGroup must be defined")
-        return _hg
 
     def gettemplate(self):
         for template in self.webservice.call_clapi('gettemplate', 'HOST', self.name)['result']:
@@ -71,15 +41,15 @@ class Host(CentreonObject):
         return self.templates
 
     def settemplate(self, template=None):
-        values = [self.name, self.__build_template(template)]
+        values = [self.name, "|".join(self._build_param(template, HostTemplate()))]
         return self.webservice.call_clapi('settemplate', 'HOST', values)
 
     def addtemplate(self, template=None):
-        values = [self.name, self.__build_template(template)]
+        values = [self.name, "|".join(self._build_param(template, HostTemplate()))]
         return self.webservice.call_clapi('addtemplate', 'HOST', values)
 
     def deletetemplate(self, template=None):
-        values = [self.name, self.__build_template(template)]
+        values = [self.name, str("|".join(self._build_param(template, HostTemplate())))]
         return self.webservice.call_clapi('delemplate', 'HOST', values)
 
     def applytemplate(self):
@@ -92,7 +62,7 @@ class Host(CentreonObject):
         return self.webservice.call_clapi('disable', 'HOST', self.name)
 
     def setinstance(self, instance):
-        values = [self.name, instance]
+        values = [self.name, str(self._build_param(instance, Poller()))]
         return self.webservice.call_clapi('setinstance', 'HOST', values)
 
     def status(self):
@@ -116,15 +86,15 @@ class Host(CentreonObject):
         return self.webservice.call_clapi('gethostgroup', 'HOST', self.name)
 
     def addhostgroup(self, hostgroup=None):
-        values = [self.name, self.__build_hostgroup(hostgroup)]
+        values = [self.name, "|".join(self._build_param(hostgroup, HostGroup()))]
         return self.webservice.call_clapi('addhostgroup', 'HOST', values)
 
     def sethostgroup(self, hostgroup=None):
-        values = [self.name, self.__build_hostgroup(hostgroup)]
+        values = [self.name, "|".join(self._build_param(hostgroup, HostGroup()))]
         return self.webservice.call_clapi('sethostgroup', 'HOST', values)
 
     def deletehostgroup(self, hostgroup=None):
-        values = [self.name, self.__build_hostgroup(hostgroup)]
+        values = [self.name, "|".join(self._build_param(hostgroup, HostGroup()))]
         return self.webservice.call_clapi('delhostgroup', 'HOST', values)
 
     def getcontactgroup(self):
@@ -156,6 +126,10 @@ class Host(CentreonObject):
 
     def unsetseverity(self):
         return self.webservice.call_clapi('unsetseverity', 'HOST', self.name)
+
+    def setparam(self, name, value):
+        values = [self.name, name, value]
+        return self.webservice.call_clapi('setparam', 'HOST', values)
 
 
 class HostMacro(CentreonObject):
@@ -205,66 +179,36 @@ class Hosts(CentreonDecorator, CentreonClass):
         return self.hosts
 
     @CentreonDecorator.post_refresh
-    def add(self, name, alias, ip, instance, template=None, hg=None):
+    def add(self, name, alias, ip, instance=None, template=None, hg=None):
         """
         Add new Host on Centreon platform
         :param name: name for host
         :param alias:  alias (short name for example)
         :param ip: Ip address or DNS
         :param instance: Poller() or str()
-        :param template: HostTemplate(), list() of HostTemplate() or str()
-        :param hg: HostGroup(), list() of HostGroup() or str()
+        :param template: HostTemplate(), list() of HostTemplate(), list() of str() or str()
+        :param hg: HostGroup(), list() of HostGroup(), list() of str() or str()
         :return:
         """
-        if template and isinstance(template, HostTemplate):
-            _hosttmpl = template.name
-        elif template and isinstance(template, list):
-            tmp_hosttmpl = list()
-            for htmpl in template:
-                tmp_hosttmpl.append(htmpl.name)
-            _hosttmpl = "|".join(tmp_hosttmpl)
-        elif template and isinstance(template, str):
-            _hosttmpl = template
-        else:
-            raise ValueError("HostTemplate must be defined")
-
-        if hg and isinstance(hg, HostGroup):
-            _hg = hg.name
-        elif hg and isinstance(hg, list):
-            tmp_hg = list()
-            for group in hg:
-                tmp_hg.append(group.name)
-            _hg = "|".join(tmp_hg)
-        elif hg and isinstance(hg, str):
-            _hg = hg
-        else:
-            raise ValueError("HostGroups must be defined")
-
-        if instance and isinstance(instance, Poller):
-            _instance = instance.name
-        elif instance and isinstance(instance, str):
-            _instance = instance
-        else:
-            raise ValueError("Instance (poller) must be defined")
-
         values = [
             name,
             alias,
             ip,
-            str(_hosttmpl),
-            str(_instance),
-            str(_hg)
+            str("|".join(self._build_param(template, HostTemplate()))),
+            str(self._build_param(instance, Poller())),
+            str("|".join(self._build_param(hg, HostGroup())))
         ]
         return self.webservice.call_clapi('add', 'HOST', values)
 
     @CentreonDecorator.post_refresh
     def delete(self, host):
-        return self.webservice.call_clapi('del', 'HOST', host.name)
+        value = str(self._build_param(host, Hosts()))
+        return self.webservice.call_clapi('del', 'HOST', value)
 
-    @CentreonDecorator.post_refresh
-    def setparam(self, host, name, value):
-        values = [host.name, name, value]
-        return self.webservice.call_clapi('setparam', 'HOST', values)
+    #@CentreonDecorator.post_refresh
+    #def setparam(self, host, name, value):
+    #    values = [host.name, name, value]
+    #    return self.webservice.call_clapi('setparam', 'HOST', values)
 
     #def getservices(self, host):
     #    values = {'searchHost': host.name}

@@ -17,6 +17,23 @@ class Poller(CentreonObject):
         self.ssh_port = properties['ssh port']
         self.stats_bin = properties['stats bin']
         self.status = properties['status']
+        self.pollerHost = dict()
+
+    def add(self, *args, **kwargs):
+        pass
+
+    def delete(self, *args, **kwargs):
+        pass
+
+    def setparam(self, *args, **kwargs):
+        pass
+
+    def gethosts(self):
+        for poller in self.webservice.call_clapi('gethosts', 'INSTANCE', self.name)['result']:
+            poller['poller'] = poller.name
+            pollerhost_obj = PollerHost(poller)
+            self.pollerHost[pollerhost_obj.name] = pollerhost_obj
+        return self.pollerHost
 
 
 class PollerHost(CentreonObject):
@@ -36,7 +53,6 @@ class Pollers(CentreonDecorator, CentreonClass):
     def __init__(self):
         super(Pollers, self).__init__()
         self.pollers = dict()
-        self.pollerHost = dict()
 
     def __contains__(self, name):
         return name in self.pollers.keys()
@@ -66,18 +82,4 @@ class Pollers(CentreonDecorator, CentreonClass):
     def list(self):
         return self.pollers
 
-    def add(self, *args, **kwargs):
-        pass
 
-    def delete(self, *args, **kwargs):
-        pass
-
-    def setparam(self, *args, **kwargs):
-        pass
-
-    def gethosts(self, poller):
-        for poller in self.webservice.call_clapi('gethosts', 'INSTANCE', poller.name)['result']:
-            poller['poller'] = poller.name
-            pollerhost_obj = PollerHost(poller)
-            self.pollerHost[pollerhost_obj.name] = pollerhost_obj
-        return self.pollerHost

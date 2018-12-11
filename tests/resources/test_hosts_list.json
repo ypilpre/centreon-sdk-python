@@ -1,0 +1,25 @@
+{
+  "result": [
+   {
+     "id": "12",
+     "name": "mail-uranus-frontend",
+     "alias": "mail-uranus-frontend",
+     "address": "mail-uranus-frontend",
+     "activate": "1"
+   },
+   {
+     "id": "13",
+     "name": "mail-neptune-frontend",
+     "alias": "mail-neptune-frontend",
+     "address": "mail-neptune-frontend",
+     "activate": "1"
+   },
+   {
+     "id": "14",
+     "name": "srvi-mysql01",
+     "alias": "srvi-mysql01",
+     "address": "srvi-mysql01",
+     "activate": "1"
+   }
+ ]
+}

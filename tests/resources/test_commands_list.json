@@ -1,0 +1,22 @@
+{
+  "result": [
+    {
+      "line": "$CENTREONPLUGINS$/centreon_linux_snmp.pl --plugin=os::linux::snmp::plugin --mode=cpu --hostname=$HOSTADDRESS$ --snmp-version='$_HOSTSNMPVERSION$' --snmp-community='$_HOSTSNMPCOMMUNITY$' $_HOSTSNMPEXTRAOPTIONS$ --warning='$_SERVICEWARNING$'  --critical='$_SERVICECRITICAL$' $_SERVICEEXTRAOPTIONS$",
+      "type": "check",
+      "id": "112",
+      "name": "OS-Linux-SNMP-Cpu"
+    },
+    {
+      "line": "$CENTREONPLUGINS$/centreon_linux_snmp.pl --plugin=os::linux::snmp::plugin --mode=memory --hostname=$HOSTADDRESS$ --snmp-version='$_HOSTSNMPVERSION$' --snmp-community='$_HOSTSNMPCOMMUNITY$' $_HOSTSNMPEXTRAOPTIONS$ --warning='$_SERVICEWARNING$' --critical='$_SERVICECRITICAL$' $_SERVICEEXTRAOPTIONS$",
+      "type": "check",
+      "id": "111",
+      "name": "OS-Linux-SNMP-Memory"
+    },
+    {
+      "line": ["'/usr/bin/printf \"%b\" \"***** centreon Notification *****<br/><br/>Type:$NOTIFICATIONTYPE$<br/>Host: $HOSTNAME$<br/>State: $HOSTSTATE$<br/>Address: $HOSTADDRESS$<br/>Info: $HOSTOUTPUT$<br/>Date/Time: $DATE$\" '", "' @MAILER@ -s \"Host $HOSTSTATE$ alert for $HOSTNAME$!\" $CONTACTEMAIL$'"],
+      "type": "notif",
+      "id": "35",
+      "name": "host-notify-by-email"
+    }
+  ]
+}

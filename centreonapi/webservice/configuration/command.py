@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from overrides import overrides
 
 
-class CommandObj(CentreonObject):
+class Command(CentreonObject):
 
     def __init__(self, properties):
         self.id = properties['id']
@@ -27,13 +27,21 @@ class CommandObj(CentreonObject):
         else:
             return ""
 
+    def setparam(self, command, name, value):
+        values = [
+            str(self._build_command_line(command, Command())),
+            name,
+            value
+        ]
+        return self.webservice.call_clapi('setparam', 'CMD', values)
 
-class Command(CentreonDecorator, CentreonClass):
+
+class Commands(CentreonDecorator, CentreonClass):
     """
     Centreon Web Command object
     """
     def __init__(self):
-        super(Command, self).__init__()
+        super(Commands, self).__init__()
         self.commands = dict()
 
     def __contains__(self, name):
@@ -47,11 +55,10 @@ class Command(CentreonDecorator, CentreonClass):
         else:
             raise ValueError("Command %s not found" % name)
 
-    @overrides
     def _refresh_list(self):
         self.commands.clear()
         for command in self.webservice.call_clapi('show', 'CMD')['result']:
-            command_obj = CommandObj(command)
+            command_obj = Command(command)
             self.commands[command_obj.name] = command_obj
 
     @CentreonDecorator.pre_refresh
@@ -69,14 +76,15 @@ class Command(CentreonDecorator, CentreonClass):
 
     @CentreonDecorator.post_refresh
     def delete(self, command, post_refresh=True):
-        return self.webservice.call_clapi('del', 'CMD', command.name)
+        value = str(self._build_param(command, Command))[0]
+        return self.webservice.call_clapi('del', 'CMD', value)
 
-    @CentreonDecorator.post_refresh
-    def setparam(self, command, name, value, post_refresh=True):
-        values = [
-            command.name,
-            name,
-            value
-        ]
-        return self.webservice.call_clapi('setparam', 'CMD', values)
+    #@CentreonDecorator.post_refresh
+    #def setparam(self, command, name, value, post_refresh=True):
+    #    values = [
+    #        command.name,
+    #        name,
+    #        value
+    #    ]
+    #    return self.webservice.call_clapi('setparam', 'CMD', values)
 

@@ -17,5 +17,5 @@ setup(
         'Programming Language :: Python :: 3'
     ],
     packages=find_packages(),
-    install_requires=['requests', 'bs4']
+    install_requires=['requests', 'bs4', 'deprecated', 'overrides']
 )
