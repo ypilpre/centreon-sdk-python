@@ -1,0 +1,6 @@
+{
+  "line": "$CENTREONPLUGINS$/centreon_linux_snmp.pl --plugin=os::linux::snmp::plugin --mode=cpu --hostname=$HOSTADDRESS$ --snmp-version='$_HOSTSNMPVERSION$' --snmp-community='$_HOSTSNMPCOMMUNITY$' $_HOSTSNMPEXTRAOPTIONS$ --warning='$_SERVICEWARNING$'  --critical='$_SERVICECRITICAL$' $_SERVICEEXTRAOPTIONS$",
+  "type": "check",
+  "id": "112",
+  "name": "OS-Linux-SNMP-Cpu"
+}

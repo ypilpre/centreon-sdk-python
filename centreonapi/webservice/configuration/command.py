@@ -8,10 +8,11 @@ from overrides import overrides
 class Command(CentreonObject):
 
     def __init__(self, properties):
-        self.id = properties['id']
-        self.name = properties['name']
-        self.line = self._build_command_line(properties['line'])
-        self.type = properties['type']
+        self.webservice = Webservice.getInstance()
+        self.id = properties.get('id')
+        self.name = properties.get('name')
+        self.line = self._build_command_line(properties.get('line'))
+        self.type = properties.get('type')
 
     @staticmethod
     def _build_command_line(line):
@@ -27,9 +28,9 @@ class Command(CentreonObject):
         else:
             return ""
 
-    def setparam(self, command, name, value):
+    def setparam(self, name, value):
         values = [
-            str(self._build_command_line(command, Command())),
+            self.name,
             name,
             value
         ]
@@ -76,15 +77,8 @@ class Commands(CentreonDecorator, CentreonClass):
 
     @CentreonDecorator.post_refresh
     def delete(self, command, post_refresh=True):
-        value = str(self._build_param(command, Command))[0]
+        value = str(self._build_param(command, Command)[0])
         return self.webservice.call_clapi('del', 'CMD', value)
 
-    #@CentreonDecorator.post_refresh
-    #def setparam(self, command, name, value, post_refresh=True):
-    #    values = [
-    #        command.name,
-    #        name,
-    #        value
-    #    ]
-    #    return self.webservice.call_clapi('setparam', 'CMD', values)
+
 

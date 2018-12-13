@@ -1,0 +1,10 @@
+
+{
+  "activate": "1",
+  "comment": "Centreon Plugins Path",
+  "id": "2",
+  "instance": ["Central", "poller1", "poller2"],
+  "name": "$CENTREONPLUGINS$",
+  "value": "/usr/lib/centreon/plugins"
+}
+

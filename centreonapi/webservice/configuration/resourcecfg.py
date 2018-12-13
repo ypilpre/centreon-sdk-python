@@ -7,11 +7,12 @@ from centreonapi.webservice.configuration.poller import Poller
 class ResourceCFG(CentreonObject):
 
     def __init__(self, properties):
-        self.id = properties['id']
-        self.instance = properties['instance']
-        self.name = properties['name']
-        self.activate = properties['activate']
-        self.value = properties['value']
+        self.webservice = Webservice.getInstance()
+        self.id = properties.get('id')
+        self.instance = properties.get('instance')
+        self.name = properties.get('name')
+        self.activate = properties.get('activate')
+        self.value = properties.get('value')
 
     def setparam(self, name, value):
         values = [
@@ -70,21 +71,12 @@ class ResourceCFGs(CentreonDecorator, CentreonClass):
         values = [
             rscname,
             rscvalue,
-            str(self._build_param(rscinstance, Poller())),
+            str(self._build_param(rscinstance, Poller)[0]),
             rsccomment
         ]
         return self.webservice.call_clapi('add', 'RESOURCECFG', values)
 
     @CentreonDecorator.post_refresh
     def delete(self, resource, post_refresh=True):
-        value = int(self._build_resource_line(resource, ResourceCFG()))[0]
+        value = str(self._build_param(resource, ResourceCFG, attr='id')[0])
         return self.webservice.call_clapi('del', 'RESOURCECFG', value)
-
-    #@CentreonDecorator.post_refresh
-    #def setparam(self, resource, name, value, post_refresh=True):
-    #    values = [
-    #        resource.id,
-    #        name,
-    #        value
-    #    ]
-    #    return self.webservice.call_clapi('setparam', 'RESOURCECFG', values)
