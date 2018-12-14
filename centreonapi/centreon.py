@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from centreonapi.webservice.configuration.host import *
+from centreonapi.webservice.configuration.host import Hosts
+from centreonapi.webservice.configuration.host import HostTemplates
 from centreonapi.webservice.configuration.service import Service
 from centreonapi.webservice.configuration.poller import Pollers
 from centreonapi.webservice.configuration.hostgroups import HostGroups
-from centreonapi.webservice.configuration.templates import HostTemplates
 from centreonapi.webservice.configuration.command import Commands
 from centreonapi.webservice.configuration.resourcecfg import ResourceCFGs
+from centreonapi.webservice import Webservice
 
 
 class Centreon(object):

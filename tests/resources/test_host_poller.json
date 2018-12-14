@@ -1,0 +1,12 @@
+{
+  "id": "1",
+  "name": "Central",
+  "localhost": "1",
+  "ip address": "127.0.0.1",
+  "activate": "1",
+  "status": "1",
+  "init script": "centengine",
+  "bin": "/usr/sbin/centengine",
+  "stats bin": "/usr/sbin/centenginestats",
+  "ssh port": "22"
+}

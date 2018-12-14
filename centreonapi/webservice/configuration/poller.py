@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from centreonapi.webservice.configuration.common import *
-from overrides import overrides
+import centreonapi.webservice.configuration.common as common
+from centreonapi.webservice import Webservice
 
 
-class Poller(CentreonObject):
+class Poller(common.CentreonObject):
 
     def __init__(self, properties):
+        self.webservice = Webservice.getInstance()
+        self.__clapi_action = 'INSTANCE'
         self.id = properties['id']
         self.bin = properties['bin']
         self.activate = properties['activate']
@@ -29,14 +31,17 @@ class Poller(CentreonObject):
         pass
 
     def gethosts(self):
-        for poller in self.webservice.call_clapi('gethosts', 'INSTANCE', self.name)['result']:
+        for poller in self.webservice.call_clapi(
+                'gethosts',
+                self.__clapi_action,
+                self.name)['result']:
             poller['poller'] = poller.name
             pollerhost_obj = PollerHost(poller)
             self.pollerHost[pollerhost_obj.name] = pollerhost_obj
         return self.pollerHost
 
 
-class PollerHost(CentreonObject):
+class PollerHost(common.CentreonObject):
 
     def __init__(self, properties):
         self.id = properties['id']
@@ -45,14 +50,12 @@ class PollerHost(CentreonObject):
         self.poller = properties['poller']
 
 
-class Pollers(CentreonDecorator, CentreonClass):
-    """
-    Centreon Web poller
-    """
+class Pollers(common.CentreonDecorator, common.CentreonClass):
 
     def __init__(self):
         super(Pollers, self).__init__()
         self.pollers = dict()
+        self.__clapi_action = 'INSTANCE'
 
     def __contains__(self, name):
         return name in self.pollers.keys()
@@ -65,10 +68,10 @@ class Pollers(CentreonDecorator, CentreonClass):
         else:
             raise ValueError("Instance %s not found" % name)
 
-    @overrides
     def _refresh_list(self):
         self.pollers.clear()
-        for poller in self.webservice.call_clapi('show', 'INSTANCE')['result']:
+        for poller in self.webservice.call_clapi(
+                'show', self.__clapi_action)['result']:
             poller_obj = Poller(poller)
             self.pollers[poller_obj.name] = poller_obj
 
@@ -78,8 +81,6 @@ class Pollers(CentreonDecorator, CentreonClass):
         """
         return self.webservice.call_clapi('applycfg', None, pollername)
 
-    @CentreonDecorator.pre_refresh
+    @common.CentreonDecorator.pre_refresh
     def list(self):
         return self.pollers
-
-

@@ -1,21 +1,55 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
 
-from setuptools import setup, find_packages
+import os
+import sys
+
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
+
+
+if sys.argv[-1] == 'publish':
+    os.system('python setup.py sdist upload')
+    sys.exit()
+
+readme = open('README.rst').read()
+doclink = """
+Documentation
+-------------
+
+The full documentation is at http://centreonapi.rtfd.org."""
+history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
     name='centreonapi',
-    version='0.0.3',
+    version='0.1.0',
     description='Centreon Api for use Webservice in Centreon Web 2.8.0 or later',
-    author='Centreon Team',
-    author_email='contact@centreon.com',
+    long_description=readme + '\n\n' + doclink + '\n\n' + history,
+    author='Guillaume Watteeux',
+    author_email='g@15x.fr',
+    url='https://github.com/guillaumewatteeux/centreonapi',
+    packages=[
+        'centreonapi',
+    ],
+    package_dir={'centreonapi': 'centreonapi'},
+    include_package_data=True,
+    install_requires=[
+        'requests',
+        'bs4',
+    ],
     license='Apache-2.0',
+    zip_safe=False,
+    keywords='centreonapi',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
+        'Natural Language :: English',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 3'
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: Implementation :: PyPy',
     ],
-    packages=find_packages(),
-    install_requires=['requests', 'bs4', 'deprecated', 'overrides']
 )
+
