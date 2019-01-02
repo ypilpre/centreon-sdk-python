@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from centreonapi.webservice.configuration.common import *
+import centreonapi.webservice.configuration.common as common
+from centreonapi.webservice import Webservice
 from bs4 import BeautifulSoup
-from overrides import overrides
 
 
-class Command(CentreonObject):
+class Command(common.CentreonObject):
 
     def __init__(self, properties):
         self.webservice = Webservice.getInstance()
+        self.__clapi_action = 'CMD'
         self.id = properties.get('id')
         self.name = properties.get('name')
         self.line = self._build_command_line(properties.get('line'))
@@ -34,16 +35,19 @@ class Command(CentreonObject):
             name,
             value
         ]
-        return self.webservice.call_clapi('setparam', 'CMD', values)
+        return self.webservice.call_clapi('setparam',
+                                          self.__clapi_action,
+                                          values)
 
 
-class Commands(CentreonDecorator, CentreonClass):
+class Commands(common.CentreonDecorator, common.CentreonClass):
     """
     Centreon Web Command object
     """
     def __init__(self):
         super(Commands, self).__init__()
         self.commands = dict()
+        self.__clapi_action = "CMD"
 
     def __contains__(self, name):
         return name in self.commands.keys()
@@ -58,27 +62,29 @@ class Commands(CentreonDecorator, CentreonClass):
 
     def _refresh_list(self):
         self.commands.clear()
-        for command in self.webservice.call_clapi('show', 'CMD')['result']:
+        for command in self.webservice.call_clapi(
+                'show',
+                self.__clapi_action)['result']:
             command_obj = Command(command)
             self.commands[command_obj.name] = command_obj
 
-    @CentreonDecorator.pre_refresh
+    @common.CentreonDecorator.pre_refresh
     def list(self):
         return self.commands
 
-    @CentreonDecorator.post_refresh
+    @common.CentreonDecorator.post_refresh
     def add(self, cmdname, cmdtype, cmdline, post_refresh=True):
         values = [
             cmdname,
             cmdtype,
             cmdline
         ]
-        return self.webservice.call_clapi('add', 'CMD', values)
+        return self.webservice.call_clapi(
+            'add',
+            self.__clapi_action,
+            values)
 
-    @CentreonDecorator.post_refresh
+    @common.CentreonDecorator.post_refresh
     def delete(self, command, post_refresh=True):
-        value = str(self._build_param(command, Command)[0])
-        return self.webservice.call_clapi('del', 'CMD', value)
-
-
-
+        value = str(common.build_param(command, Command)[0])
+        return self.webservice.call_clapi('del', self.__clapi_action, value)

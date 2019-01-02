@@ -1,0 +1,24 @@
+{
+  "result": [
+    {
+      "id": "6",
+      "name": "OS-Linux-SNMP-custom"
+    },
+    {
+      "id": "68",
+      "name": "OS-Linux-SNMP-Disk-/"
+    },
+    {
+      "id": "70",
+      "name": "OS-Linux-SNMP-Disk-/home"
+    },
+    {
+      "id": "413",
+      "name": "OS-Linux-SNMP-Traffic-eth0"
+    },
+    {
+      "id": "509",
+      "name": "App-Backup-System"
+    }
+  ]
+}

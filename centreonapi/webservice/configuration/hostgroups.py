@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 
-from centreonapi.webservice.configuration.common import *
+import centreonapi.webservice.configuration.common as common
 
 
-class HostGroup(CentreonObject):
+class HostGroup(common.CentreonObject):
 
     def __init__(self, properties):
-        self.id = properties['id']
-        self.alias = properties['alias']
-        self.name = properties['name']
+        self.id = properties.get('id')
+        self.alias = properties.get('alias')
+        self.name = properties.get('name')
 
 
-class HostGroups(CentreonDecorator, CentreonClass):
+class HostGroups(common.CentreonDecorator, common.CentreonClass):
 
     def __init__(self):
         super(HostGroups, self).__init__()
         self.hostgroups = dict()
+        self.__clapi_action = 'HG'
 
     def __contains__(self, name):
         return name in self.hostgroups.keys()
@@ -30,21 +31,21 @@ class HostGroups(CentreonDecorator, CentreonClass):
 
     def _refresh_list(self):
         self.hostgroups.clear()
-        for hg in self.webservice.call_clapi('show', 'HG')['result']:
+        for hg in self.webservice.call_clapi(
+                'show',
+                self.__clapi_action)['result']:
             hg_obj = HostGroup(hg)
             self.hostgroups[hg_obj.name] = hg_obj
 
-    @CentreonDecorator.pre_refresh
+    @common.CentreonDecorator.pre_refresh
     def list(self):
         return self.hostgroups
 
-    @CentreonDecorator.post_refresh
+    @common.CentreonDecorator.post_refresh
     def add(self, name, alias):
-        values = [ name, alias]
-        return self.webservice.call_clapi('add', 'HG', values)
+        values = [name, alias]
+        return self.webservice.call_clapi('add', self.__clapi_action, values)
 
-    @CentreonDecorator.post_refresh
+    @common.CentreonDecorator.post_refresh
     def delete(self, name):
-        return self.webservice.call_clapi('del', 'HG', name)
-
-
+        return self.webservice.call_clapi('del', self.__clapi_action, name)

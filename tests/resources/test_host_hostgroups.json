@@ -1,0 +1,23 @@
+{
+  "result": [
+    {
+      "id": "191",
+      "name": "dc1"
+    },
+    {
+      "id": "1",
+      "name": "Linux-Servers"
+    },
+    {
+      "id": "115",
+      "name": "centreon-prj"
+    },
+    {
+      "id": "116",
+      "name": "centreon-prod"
+    },
+    {
+      "id": "83",
+      "name": "_prod"}
+  ]
+}

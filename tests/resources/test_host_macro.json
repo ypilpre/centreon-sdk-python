@@ -1,0 +1,7 @@
+{
+  "macro name": "NRPEPORT",
+  "macro value": "5666",
+  "is_password": "",
+  "description": "",
+  "source": "OS-Linux-NRPE-base"
+}

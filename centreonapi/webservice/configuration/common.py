@@ -3,6 +3,23 @@
 from centreonapi.webservice import Webservice
 
 
+def build_param(param=None, objecttype=None, attr='name'):
+    if not param:
+        raise ("Param must be defined")
+    param_list = list()
+    return_list = list()
+    if not isinstance(param, list):
+        param_list.append(param)
+    else:
+        param_list = list(param)
+    for k in param_list:
+        if isinstance(k, str):
+            return_list.append(k)
+        elif isinstance(k, objecttype):
+            return_list.append(k.__dict__[attr])
+    return return_list
+
+
 class CentreonDecorator(object):
 
     @staticmethod
@@ -39,6 +56,7 @@ class CentreonClass(object):
 
     def __init__(self):
         self.webservice = Webservice.getInstance()
+        self.__clapi_action = ""
 
     def get(self, name):
         return self[name]
@@ -48,23 +66,6 @@ class CentreonClass(object):
 
     def list(self):
         pass
-
-    @staticmethod
-    def _build_param(param=None, objecttype=None, attr='name'):
-        if not param:
-            raise ("Param must be defined")
-        param_list = list()
-        return_list = list()
-        if not isinstance(param, list):
-            param_list.append(param)
-        else:
-            param_list = list(param)
-        for k in param_list:
-            if isinstance(k, str):
-                return_list.append(k)
-            elif isinstance(k, objecttype):
-                return_list.append(k.__dict__[attr])
-        return return_list
 
 
 class CentreonObject(object):

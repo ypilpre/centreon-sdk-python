@@ -121,11 +121,13 @@ class Webservice(object):
                 raise ValueError("Only support <hosts> or <services>")
 
         if not self.check_ssl:
-        #    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-            requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+            # urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+            requests.packages.urllib3\
+                .disable_warnings(InsecureRequestWarning)
 
         request = requests.get(
-            self.url + '/api/index.php?object=centreon_realtime_' + obj + '&action=' + action,
+            self.url + '/api/index.php?object=centreon_realtime_'
+                     + obj + '&action=' + action,
             headers={
                 'Content-Type': 'application/json',
                 'centreon-auth-token': self.auth_token
@@ -135,7 +137,6 @@ class Webservice(object):
         )
         request.raise_for_status()
         return request.json()
-
 
     @staticmethod
     def getInstance(url=None, username=None, password=None, check_ssl=True):

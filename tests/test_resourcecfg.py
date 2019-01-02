@@ -1,11 +1,14 @@
-from centreonapi.centreon import Centreon
-from centreonapi.centreon import Webservice
-from centreonapi.webservice.configuration.resourcecfg import ResourceCFG
-from mock import patch
+"""
+Tests for `centreonapi` module.
+"""
 import pytest
 import responses
 import json
 import os
+from centreonapi.centreon import Centreon
+from centreonapi.webservice import Webservice
+from centreonapi.webservice.configuration.resourcecfg import ResourceCFG
+from mock import patch
 from path import Path
 
 
@@ -27,11 +30,10 @@ class TestConnect:
         wsresponses = '{"authToken": "NTc1MDU3MGE3M2JiODIuMjA4OTA2OTc="}'
         responses.add(responses.POST,
                       'http://api.domain.tld/centreon/api/index.php?action=authenticate',
-                      body=wsresponses, status="200", content_type='application/json')
+                      body=wsresponses, status=200, content_type='application/json')
 
         myconn = Webservice.getInstance(url, username, password)
         myconn.auth()
-        print myconn.auth_token
         assert mytoken == myconn.auth_token
 
 
@@ -54,7 +56,7 @@ class TestResourceCFG:
         wsresponses = '{"authToken": "NTc1MDU3MGE3M2JiODIuMjA4OTA2OTc="}'
         responses.add(responses.POST,
                       'http://api.domain.tld/centreon/api/index.php?action=authenticate',
-                      body=wsresponses, status="200", content_type='application/json')
+                      body=wsresponses, status=200, content_type='application/json')
         return Centreon(url, username, password)
 
     @responses.activate
@@ -63,7 +65,7 @@ class TestResourceCFG:
             wsresponses = json.load(data)
         responses.add(responses.POST,
                       'http://api.domain.tld/centreon/api/index.php?action=action&object=centreon_clapi',
-                      json=wsresponses, status="200", content_type='application/json')
+                      json=wsresponses, status=200, content_type='application/json')
 
         res = centreon_con.resourcecfgs.get('$_HOSTSNMPVERSION$')
         assert res.name == "$_HOSTSNMPVERSION$"
@@ -74,7 +76,7 @@ class TestResourceCFG:
             wsresponses = json.load(data)
         responses.add(responses.POST,
                       'http://api.domain.tld/centreon/api/index.php?action=action&object=centreon_clapi',
-                      json=wsresponses, status="200", content_type='application/json')
+                      json=wsresponses, status=200, content_type='application/json')
 
         res = centreon_con.resourcecfgs.get('_HOSTSNMPVERSION')
         assert res.name == "$_HOSTSNMPVERSION$"
@@ -85,7 +87,7 @@ class TestResourceCFG:
             wsresponses = json.load(data)
         responses.add(responses.POST,
                       'http://api.domain.tld/centreon/api/index.php?action=action&object=centreon_clapi',
-                      json=wsresponses, status="200", content_type='application/json')
+                      json=wsresponses, status=200, content_type='application/json')
         with pytest.raises(ValueError):
             centreon_con.resourcecfgs.get('empty')
 

@@ -1,0 +1,39 @@
+{
+  "result": [
+    {
+      "macro name": "MATTERMOST_CHAN",
+      "macro value": "centreon",
+      "is_password": "",
+      "description": "",
+      "source": "direct"
+    },
+    {
+      "macro name": "NRPEPORT",
+      "macro value": "5666",
+      "is_password": "",
+      "description": "",
+      "source": "OS-Linux-NRPE-base"
+    },
+    {
+      "macro name": "NRPECLIENT",
+      "macro value": "check_centreon_nrpe",
+      "is_password": "",
+      "description": "",
+      "source": "OS-Linux-NRPE"
+    },
+    {
+      "macro name": "NRPEEXTRAOPTIONS",
+      "macro value": "-u",
+      "is_password": "",
+      "description": "",
+      "source": "OS-Linux-NRPE"
+    },
+    {
+      "macro name": "NRPETIMEOUT",
+      "macro value": "30",
+      "is_password": "",
+      "description": "",
+      "source": "OS-Linux-NRPE"
+    }
+  ]
+}
