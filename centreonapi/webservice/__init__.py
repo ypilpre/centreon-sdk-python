@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import requests
-import json
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 
@@ -58,7 +57,7 @@ class Webservice(object):
         """
         request = requests.post(
             self.url + '/api/index.php?action=authenticate',
-            data={
+            json={
                 'username': self.authuser,
                 'password': self.authpass
             },
@@ -95,11 +94,8 @@ class Webservice(object):
 
         request = requests.post(
             self.url + '/api/index.php?action=action&object=centreon_clapi',
-            headers={
-                'Content-Type': 'application/json',
-                'centreon-auth-token': self.auth_token
-            },
-            data=json.dumps(data),
+            headers={'centreon-auth-token': self.auth_token},
+            json=data,
             verify=self.check_ssl
         )
         request.raise_for_status()
