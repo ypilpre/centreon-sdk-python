@@ -57,7 +57,7 @@ class Webservice(object):
         """
         request = requests.post(
             self.url + '/api/index.php?action=authenticate',
-            json={
+            data={
                 'username': self.authuser,
                 'password': self.authpass
             },
